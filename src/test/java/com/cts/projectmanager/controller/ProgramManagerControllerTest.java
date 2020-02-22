@@ -47,7 +47,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(ProgramManagerController.class)
-public class ProjectManagerControllerTest {
+public class ProgramManagerControllerTest {
 	
 	@InjectMocks
 	private ProgramManagerController programManagerController;
@@ -98,9 +98,16 @@ public class ProjectManagerControllerTest {
 	@Test
 	public void testUpdateUser() throws Exception {
 		User req = new User();
+		req.setEmployeeId(123);
+		req.setFirstName("firstname");
+		req.setLastName("lastName");
+		req.setUserId(123);
 		when(programManagerService.updateUser(req)).thenReturn(req);
 		this.mockMvc.perform(put("/user").contentType(contentType).content(convertReqObjToJson(req)).accept(MediaType.APPLICATION_JSON)).
 			andExpect(status().isOk());
+		when(programManagerService.updateUser(Mockito.any())).thenThrow(new RuntimeException());
+		this.mockMvc.perform(put("/user").contentType(contentType).content(convertReqObjToJson(req)).accept(MediaType.APPLICATION_JSON)).
+		andExpect(status().isInternalServerError());
 	}
 	
 	/*@Test
@@ -110,6 +117,35 @@ public class ProjectManagerControllerTest {
 			andExpect(status().isOk());
 	}*/
 	
+	
+	
+	@Test
+	public void testdeleteUser() throws Exception {
+		
+		when(programManagerService.deleteUser(123)).thenReturn("Success");
+		this.mockMvc.perform(delete("/user/123").contentType(contentType).content(convertReqObjToJson(new Integer(123))).accept(MediaType.APPLICATION_JSON)).
+			andExpect(status().isOk());
+		when(programManagerService.deleteUser(Mockito.anyInt())).thenThrow(new RuntimeException());
+		
+		this.mockMvc.perform(delete("/user/123").contentType(contentType).content(convertReqObjToJson(new Integer(123))).accept(MediaType.APPLICATION_JSON)).
+		andExpect(status().isInternalServerError());
+	}
+
+	
+	@Test
+	public void testdeleteProject() throws Exception {
+		Project project = new Project();
+		project.setProjectId(123);
+		when(programManagerService.deleteProject(project)).thenReturn("Success");
+		this.mockMvc.perform(delete("/project").contentType(contentType).content(convertReqObjToJson(project)).accept(MediaType.APPLICATION_JSON)).
+			andExpect(status().isOk());
+		when(programManagerService.deleteProject(Mockito.any())).thenThrow(new RuntimeException());
+		
+		this.mockMvc.perform(delete("/project").contentType(contentType).content(convertReqObjToJson(project)).accept(MediaType.APPLICATION_JSON)).
+		andExpect(status().isInternalServerError());
+	}
+
+
 
 	@Test
 	public void testaddProject() throws Exception {
@@ -121,6 +157,10 @@ public class ProjectManagerControllerTest {
 		when(programManagerService.addProject(Mockito.any(),Mockito.anyInt())).thenReturn(status);
 		this.mockMvc.perform(post("/project/1").contentType(contentType).content(convertReqObjToJson(req)).accept(MediaType.APPLICATION_JSON)).
 			andExpect(status().isOk());
+		
+		when(programManagerService.addProject(Mockito.any(),Mockito.anyInt())).thenThrow(new RuntimeException());
+		this.mockMvc.perform(post("/project/1").contentType(contentType).content(convertReqObjToJson(req)).accept(MediaType.APPLICATION_JSON)).
+		andExpect(status().isInternalServerError());
 	}
 	
 	@Test
@@ -133,6 +173,10 @@ public class ProjectManagerControllerTest {
 		when(programManagerService.updateProject(Mockito.any())).thenReturn(status);
 		this.mockMvc.perform(put("/project").contentType(contentType).content(convertReqObjToJson(req)).accept(MediaType.APPLICATION_JSON)).
 			andExpect(status().isOk());
+		
+		when(programManagerService.updateProject(Mockito.any())).thenThrow(new RuntimeException());
+		this.mockMvc.perform(put("/project").contentType(contentType).content(convertReqObjToJson(req)).accept(MediaType.APPLICATION_JSON)).
+			andExpect(status().isInternalServerError());
 	}
 	
 	@Test
@@ -141,6 +185,10 @@ public class ProjectManagerControllerTest {
 		when(programManagerService.getProjects()).thenReturn(req);
 		this.mockMvc.perform(get("/project").contentType(contentType).accept(MediaType.APPLICATION_JSON)).
 			andExpect(status().isOk());
+		
+		when(programManagerService.getProjects()).thenThrow(new RuntimeException());
+		this.mockMvc.perform(get("/project").contentType(contentType).accept(MediaType.APPLICATION_JSON)).
+			andExpect(status().isInternalServerError());
 	}
 	
 	@Test

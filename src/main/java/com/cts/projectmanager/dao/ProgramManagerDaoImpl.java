@@ -71,10 +71,10 @@ public class ProgramManagerDaoImpl implements ProgramManagerDao {
 			Session session = entityManager.unwrap(Session.class);
 			
 			User user = session.get(User.class, userId);
-			log.info("Before addProject "+user.getUserId());
+			//log.info("Before addProject "+user.getUserId());
 			project.setUser(user);
 			session.saveOrUpdate(project);
-			log.info("Added addProject "+user.getUserId());
+			//log.info("Added addProject "+user.getUserId());
 		}catch(Exception e) {
 			throw e;
 		}
@@ -106,7 +106,18 @@ public class ProgramManagerDaoImpl implements ProgramManagerDao {
 		Session session = entityManager.unwrap(Session.class);
 		Query query = session.createQuery("from Project",Project.class);
 		projectList=  query.getResultList();
-		for(Project p: projectList) {
+		if(null != projectList && projectList.size()>=1) {
+			projectList.stream().forEach(project->{
+				int projectId = project.getProjectId();
+				Query query2 = session.createQuery("from Task task where task.project.projectId=:project_id");
+				query2.setParameter("project_id", projectId);
+				Query query3 = session.createQuery("from Task task where task.status='completed'");
+				project.setTaskCount(query2.getResultList().size());
+				project.setCompletedTasks(query3.getResultList().size());
+				log.info("TaskCount"+project.getTaskCount());
+			});
+		}
+		/*for(Project p: projectList) {
 			int projectId = p.getProjectId();
 			Query query2 = session.createQuery("from Task task where task.project.projectId=:project_id");
 			query2.setParameter("project_id", projectId);
@@ -114,7 +125,7 @@ public class ProgramManagerDaoImpl implements ProgramManagerDao {
 			p.setTaskCount(query2.getResultList().size());
 			p.setCompletedTasks(query3.getResultList().size());
 			log.info("TaskCount"+p.getTaskCount());
-		}
+		}*/
 		}catch(Exception e) {
 			throw e;
 		}
@@ -189,7 +200,7 @@ public class ProgramManagerDaoImpl implements ProgramManagerDao {
 		Session session = entityManager.unwrap(Session.class);
 		Query query = session.createQuery("from Task",Task.class);
 		List<Task> taskList=  query.getResultList();
-		taskList = taskList.stream().filter(task->task.getProject().getProjectId()==projectId).collect(Collectors.toList());
+		taskList = taskList.stream().filter(task->task.getProject()!=null && projectId == task.getProject().getProjectId()).collect(Collectors.toList());
 		return taskList;
 	}
 	
@@ -205,7 +216,7 @@ public class ProgramManagerDaoImpl implements ProgramManagerDao {
 			Query query = session.createQuery("from ParentTask",ParentTask.class);
 			parentTaskList=  query.getResultList();
 			parentTaskList = parentTaskList.stream().filter(parentTask->
-			(parentTask.getProject().getProjectId()==projectId)).collect(Collectors.toList());
+			(parentTask.getProject()!= null &&parentTask.getProject().getProjectId()==projectId)).collect(Collectors.toList());
 			
 		}catch(Exception e) {
 			e.printStackTrace();
