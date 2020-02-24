@@ -152,17 +152,19 @@ public class ProgramManagerDaoImpl implements ProgramManagerDao {
 			Query query2 = session.createQuery("from Task task where task.project.projectId=:project_id");
 			query2.setParameter("project_id", projectId);
 			List<Task> tasks = query2.getResultList();
+			//session.delete(project);
 			for(Task task:tasks) {
 				session.delete(task);
 			}
 			
 			Query query3 = session.createQuery("from ParentTask parenttask where parenttask.project.projectId=:project_id");
 			query3.setParameter("project_id", projectId);
-			List<ParentTask> parenttasks = query2.getResultList();
+			List<ParentTask> parenttasks = query3.getResultList();
 
 			for(ParentTask parenttask:parenttasks) {
 				session.delete(parenttask);
 			}
+			//Thread.sleep(5000);
 			session.delete(project);
 			}catch(Exception e) {
 				throw e;

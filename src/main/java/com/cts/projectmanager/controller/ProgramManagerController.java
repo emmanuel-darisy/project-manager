@@ -96,7 +96,7 @@ public class ProgramManagerController {
 
 	@RequestMapping(method=RequestMethod.POST, value="/project/{userId}", produces= {org.springframework.http.MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<String> addProject(@RequestBody Project project, @PathVariable (name="userId") int userId) {
-		log.info("Inside UpdateProject with userId {} ",project.getUser().getUserId());
+		log.info("Inside add Project with userId {} ",project.getUser().getUserId());
 		String status = null;
 		try {
 			status = programManagerService.addProject(project,userId);

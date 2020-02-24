@@ -82,7 +82,7 @@ public class ProgramManagerServiceImpl implements ProgramManagerService{
 	@Override
 	@Transactional
 	public String deleteProject(int projectId) throws Exception {
-		log.info("Invoking addProject ");
+		log.info("Invoking delete Project ");
 		return programManagerDao.deleteProject(projectId);
 		
 	}
