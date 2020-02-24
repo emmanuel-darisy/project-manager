@@ -1,5 +1,7 @@
 package com.cts.projectmanager.model;
 
+import static org.hamcrest.CoreMatchers.nullValue;
+
 import java.sql.Date;
 
 import javax.persistence.Column;
@@ -13,6 +15,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Transient;
+
+import com.sun.istack.Nullable;
 
 @Entity
 public class Project {
@@ -42,7 +46,7 @@ public class Project {
 	
 	@ManyToOne
 	@JoinTable(name="Manager", joinColumns={@JoinColumn(name="projectId", referencedColumnName="project_id")},
-	inverseJoinColumns= {@JoinColumn(name="userId", referencedColumnName="user_Id")})
+	inverseJoinColumns= {@JoinColumn(name="userId", referencedColumnName="user_Id")})	
 	private User user;
 	
 	

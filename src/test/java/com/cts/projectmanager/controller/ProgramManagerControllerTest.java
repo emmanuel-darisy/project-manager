@@ -136,12 +136,12 @@ public class ProgramManagerControllerTest {
 	public void testdeleteProject() throws Exception {
 		Project project = new Project();
 		project.setProjectId(123);
-		when(programManagerService.deleteProject(project)).thenReturn("Success");
-		this.mockMvc.perform(delete("/project").contentType(contentType).content(convertReqObjToJson(project)).accept(MediaType.APPLICATION_JSON)).
+		when(programManagerService.deleteProject(123)).thenReturn("Success");
+		this.mockMvc.perform(delete("/project/123").contentType(contentType).content(convertReqObjToJson(project)).accept(MediaType.APPLICATION_JSON)).
 			andExpect(status().isOk());
-		when(programManagerService.deleteProject(Mockito.any())).thenThrow(new RuntimeException());
+		when(programManagerService.deleteProject(Mockito.anyInt())).thenThrow(new RuntimeException());
 		
-		this.mockMvc.perform(delete("/project").contentType(contentType).content(convertReqObjToJson(project)).accept(MediaType.APPLICATION_JSON)).
+		this.mockMvc.perform(delete("/project/123").contentType(contentType).content(convertReqObjToJson(project)).accept(MediaType.APPLICATION_JSON)).
 		andExpect(status().isInternalServerError());
 	}
 

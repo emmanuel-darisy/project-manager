@@ -89,6 +89,7 @@ public class ProgramManagerDaoImplTest {
 		user.setFirstName("test");
 		user.setLastName("test");
 		when(entityManager.unwrap(Mockito.any())).thenReturn(session);
+		when(session.createQuery(Mockito.anyString())).thenReturn(query);
 		assertNotNull(programManagerDao.deleteUser(userId));
 	}
 	
@@ -182,12 +183,13 @@ public class ProgramManagerDaoImplTest {
 		parentTask.setParentTask("Dummy");
 		parentTask.toString();
 		when(entityManager.unwrap(Mockito.any())).thenReturn(session);
-		assertNotNull(programManagerDao.deleteProject(project));
+		when(session.createQuery(Mockito.anyString())).thenReturn(query);
+		assertNotNull(programManagerDao.deleteProject(123));
 	}
 	
 	@Test(expected=Exception.class)
 	public void testdeleteProjectException() throws Exception {
-		assertNotNull(programManagerDao.deleteProject(project));
+		assertNotNull(programManagerDao.deleteProject(123));
 	}
 	
 	
@@ -213,7 +215,7 @@ public class ProgramManagerDaoImplTest {
 		assertNotNull(programManagerDao.addParentTask(parentTask));
 	}
 	
-	@Test
+	@Test(expected=Exception.class)
 	public void testaddParentTaskException() throws Exception {
 		ParentTask parentTask = new ParentTask();
 		programManagerDao.addParentTask(parentTask);
@@ -261,7 +263,7 @@ public class ProgramManagerDaoImplTest {
 		assertNotNull(programManagerDao.getParentTask(123));
 	}
 	
-	@Test
+	@Test(expected=Exception.class)
 	public void testgetParentTaskException() throws Exception {
 		programManagerDao.getParentTask(123);
 	}

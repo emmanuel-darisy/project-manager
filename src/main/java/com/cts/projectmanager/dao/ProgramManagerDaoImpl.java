@@ -40,8 +40,16 @@ public class ProgramManagerDaoImpl implements ProgramManagerDao {
 	@Override
 	public String deleteUser(int userId) throws Exception{
 		try{
+			List<Project> projects = new ArrayList<>();
 			Session session = entityManager.unwrap(Session.class);
-			User user = session.get(User.class, userId);
+			User user = session.get(User.class, userId);			
+			Query query2 = session.createQuery("from Project project where project.user.userId=:user_id");
+			query2.setParameter("user_id", userId);
+			projects = query2.getResultList();
+			for(Project p:projects) {
+				p.setUser(null);
+				session.saveOrUpdate(p);
+			}	
 			session.delete(user);
 			}catch(Exception e) {
 				throw e;
@@ -106,26 +114,28 @@ public class ProgramManagerDaoImpl implements ProgramManagerDao {
 		Session session = entityManager.unwrap(Session.class);
 		Query query = session.createQuery("from Project",Project.class);
 		projectList=  query.getResultList();
-		if(null != projectList && projectList.size()>=1) {
+		/*if(null != projectList && projectList.size()>=1) {
 			projectList.stream().forEach(project->{
 				int projectId = project.getProjectId();
 				Query query2 = session.createQuery("from Task task where task.project.projectId=:project_id");
 				query2.setParameter("project_id", projectId);
-				Query query3 = session.createQuery("from Task task where task.status='completed'");
+				Query query3 = session.createQuery("from Task task where task.status='completed' and task.project.projectId=:project_id");
+				query3.setParameter("project_id", projectId);
 				project.setTaskCount(query2.getResultList().size());
-				project.setCompletedTasks(query3.getResultList().size());
+				project.setCompletedTasks(query3.getResultList().size());	
 				log.info("TaskCount"+project.getTaskCount());
 			});
-		}
-		/*for(Project p: projectList) {
+		}*/
+		for(Project p: projectList) {
 			int projectId = p.getProjectId();
 			Query query2 = session.createQuery("from Task task where task.project.projectId=:project_id");
 			query2.setParameter("project_id", projectId);
-			Query query3 = session.createQuery("from Task task where task.status='completed'");
+			Query query3 = session.createQuery("from Task task where task.status='completed' and task.project.projectId=:project_id");
+			query3.setParameter("project_id", projectId);
 			p.setTaskCount(query2.getResultList().size());
 			p.setCompletedTasks(query3.getResultList().size());
 			log.info("TaskCount"+p.getTaskCount());
-		}*/
+		}
 		}catch(Exception e) {
 			throw e;
 		}
@@ -134,9 +144,25 @@ public class ProgramManagerDaoImpl implements ProgramManagerDao {
 
 	
 	@Override
-	public String deleteProject(Project project) throws Exception{
+	public String deleteProject(int projectId) throws Exception{
 		try{
 			Session session = entityManager.unwrap(Session.class);
+			Project project = session.get(Project.class, projectId);
+			 
+			Query query2 = session.createQuery("from Task task where task.project.projectId=:project_id");
+			query2.setParameter("project_id", projectId);
+			List<Task> tasks = query2.getResultList();
+			for(Task task:tasks) {
+				session.delete(task);
+			}
+			
+			Query query3 = session.createQuery("from ParentTask parenttask where parenttask.project.projectId=:project_id");
+			query3.setParameter("project_id", projectId);
+			List<ParentTask> parenttasks = query2.getResultList();
+
+			for(ParentTask parenttask:parenttasks) {
+				session.delete(parenttask);
+			}
 			session.delete(project);
 			}catch(Exception e) {
 				throw e;
@@ -159,55 +185,75 @@ public class ProgramManagerDaoImpl implements ProgramManagerDao {
 	}*/
 	
 	@Override
-	public String addTask(Task task) {
+	public String addTask(Task task) throws Exception{
+		String status="task added";
+		try {
 		Session session = entityManager.unwrap(Session.class);
 		session.saveOrUpdate(task);
-		return "task added";
+		}catch(Exception e) {
+			status= "task adding failed";
+			throw e;
+		}
+		return status;
 	}
 	
 	@Override
-	public String updateTask(Task task) {
-		Session session = entityManager.unwrap(Session.class);
-		session.saveOrUpdate(task);
-		return "Task Updated";
+	public String updateTask(Task task) throws Exception{
+		String status="task updated";
+		try {
+			Session session = entityManager.unwrap(Session.class);
+			session.saveOrUpdate(task);
+		}catch(Exception e) {
+			status= "task updation failed";
+			throw e;
+		}
+		return status;
 	}
 	
 	@Override
-	public String addParentTask(ParentTask parentTask) {
+	public String addParentTask(ParentTask parentTask) throws Exception{
 		try{
 			Session session = entityManager.unwrap(Session.class);
 			session.saveOrUpdate(parentTask);
 			}catch(Exception e) {
-				e.printStackTrace();
+				throw e;
 			}
 			return "parent task updated";
 	}
 
 	@Override
-	public List<Task> getTasks() {
-		
-		Session session = entityManager.unwrap(Session.class);
-		
-		Query query = session.createQuery("from Task",Task.class);
-		List<Task> taskList=  query.getResultList();
-		
+	public List<Task> getTasks() throws Exception {
+		List<Task> taskList= new ArrayList<>();
+		try {
+			Session session = entityManager.unwrap(Session.class);			
+			Query query = session.createQuery("from Task",Task.class);
+			taskList=  query.getResultList();
+		}catch(Exception e) {
+			throw e;
+		}
+				
 		return taskList;
 	}
 	
 	@Override
-	public List<Task> getTasks(int projectId) {
+	public List<Task> getTasks(int projectId) throws Exception {
+		List<Task> taskList= new ArrayList<>();
+		try {
+			Session session = entityManager.unwrap(Session.class);
+			Query query = session.createQuery("from Task",Task.class);
+			taskList=  query.getResultList();
+			taskList = taskList.stream().filter(task->task.getProject()!=null && projectId == task.getProject().getProjectId()).collect(Collectors.toList());
+		}catch(Exception e) {
+			throw e;
+		}
 		
-		Session session = entityManager.unwrap(Session.class);
-		Query query = session.createQuery("from Task",Task.class);
-		List<Task> taskList=  query.getResultList();
-		taskList = taskList.stream().filter(task->task.getProject()!=null && projectId == task.getProject().getProjectId()).collect(Collectors.toList());
 		return taskList;
 	}
 	
 	
 	
 	@Override
-	public List<ParentTask> getParentTask(int projectId) {
+	public List<ParentTask> getParentTask(int projectId) throws Exception {
 		
 		List<ParentTask> parentTaskList = new ArrayList<ParentTask>();
 		try{
@@ -219,7 +265,8 @@ public class ProgramManagerDaoImpl implements ProgramManagerDao {
 			(parentTask.getProject()!= null &&parentTask.getProject().getProjectId()==projectId)).collect(Collectors.toList());
 			
 		}catch(Exception e) {
-			e.printStackTrace();
+			throw e;
+			//e.printStackTrace();
 		}
 			
 		return parentTaskList;

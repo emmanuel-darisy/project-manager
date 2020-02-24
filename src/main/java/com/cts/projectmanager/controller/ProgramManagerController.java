@@ -89,6 +89,8 @@ public class ProgramManagerController {
 			return new ResponseEntity<List<User>>(usersList, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<List<User>>(usersList, HttpStatus.INTERNAL_SERVER_ERROR);
+		}finally{
+			log.info("Inside getUsers with size{}",usersList.size());
 		}
 	}
 
@@ -106,7 +108,7 @@ public class ProgramManagerController {
 	
 	@RequestMapping(method=RequestMethod.PUT, value="/project", produces= {org.springframework.http.MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<String> updateProject(@RequestBody Project project) {
-		System.out.println("Inside UpdateProject with project Id & userId"+project.getUser().getUserId());
+		log.info("Inside UpdateProject with project Id & userId"+project.getUser().getUserId());
 		try {
 			return new ResponseEntity<String>(programManagerService.updateProject(project),HttpStatus.OK);
 		} catch (Exception e) {
@@ -116,6 +118,7 @@ public class ProgramManagerController {
 	
 	@RequestMapping(method=RequestMethod.GET, value="/project", produces= {org.springframework.http.MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<List<Project>> getProjects() {
+		log.info("Inside getProjects");
 		List<Project> projects = new ArrayList<>();
 		try {
 			return new ResponseEntity<List<Project>>(programManagerService.getProjects(),HttpStatus.OK);
@@ -124,10 +127,11 @@ public class ProgramManagerController {
 		}
 	}
 	
-	@RequestMapping(method=RequestMethod.DELETE, value="/project", produces= {org.springframework.http.MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<String> deleteProject(@RequestBody Project project) {
+	@RequestMapping(method=RequestMethod.DELETE, value="/project/{projectId}", produces= {org.springframework.http.MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<String> deleteProject(@PathVariable(name="projectId") int projectId) {
+		log.info("Inside deleteProject with project Id{}",projectId);
 		try {
-			return new ResponseEntity<>(programManagerService.deleteProject(project), HttpStatus.OK);
+			return new ResponseEntity<>(programManagerService.deleteProject(projectId), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>("FAILED", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -135,38 +139,72 @@ public class ProgramManagerController {
 	
 	
 	@RequestMapping(method=RequestMethod.POST, value="/task", produces= {org.springframework.http.MediaType.APPLICATION_JSON_VALUE})
-	public String addTask(@RequestBody Task task) {
-		return programManagerService.addTask(task);
+	public ResponseEntity<String> addTask(@RequestBody Task task) {
+		log.info("Inside addTask task info {}",task);
+		try {
+			return new ResponseEntity<>(programManagerService.addTask(task), HttpStatus.OK);
+		}catch(Exception e) {
+			return new ResponseEntity<>("FAILED", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
 	}
 	
 	@RequestMapping(method=RequestMethod.PUT, value="/task", produces= {org.springframework.http.MediaType.APPLICATION_JSON_VALUE})
-	public String updateTask(@RequestBody Task task) {
-		return programManagerService.updateTask(task);
+	public ResponseEntity<String> updateTask(@RequestBody Task task) {
+		log.info("Inside updateTask task info {}",task);
+		try {
+			return new ResponseEntity<>(programManagerService.updateTask(task), HttpStatus.OK);
+		}catch(Exception e) {
+			return new ResponseEntity<>("FAILED", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@RequestMapping(method=RequestMethod.GET, value="/task", produces= {org.springframework.http.MediaType.APPLICATION_JSON_VALUE})
-	public List<Task> getTasks () {
+	public ResponseEntity<List<Task>> getTasks () {
 		log.info("Inside getTasks");
-		return programManagerService.getTasks();
+		List<Task> tasks = new ArrayList<>();
+		try {
+			return new ResponseEntity<>(programManagerService.getTasks(), HttpStatus.OK);
+		}catch(Exception e) {
+			return new ResponseEntity<>(tasks, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@RequestMapping(method=RequestMethod.GET, value="/task/{projectId}", produces= {org.springframework.http.MediaType.APPLICATION_JSON_VALUE})
-	public List<Task> getTasksById (@PathVariable(name="projectId") int projectId) {
-		List<Task> tasksList = programManagerService.getTasks(projectId);
-		log.info("Inside getTasks by projectId {}",tasksList.size());
-		return tasksList;
+	public ResponseEntity<List<Task>> getTasksById (@PathVariable(name="projectId") int projectId) {
+		List<Task> tasksList = new ArrayList<>();
+		log.info("Inside getTasksById project {}",projectId);
+		try {
+			tasksList = programManagerService.getTasks(projectId);
+			return new ResponseEntity<>(tasksList, HttpStatus.OK);
+		}catch(Exception e) {
+			return new ResponseEntity<>(tasksList, HttpStatus.INTERNAL_SERVER_ERROR);
+		}		
 	}
 	
 	@RequestMapping(method=RequestMethod.POST, value="/parentTask", produces= {org.springframework.http.MediaType.APPLICATION_JSON_VALUE})
-	public String addParentTask(@RequestBody ParentTask parentTask) {
-		return programManagerService.addParentTask(parentTask);
+	public ResponseEntity<String> addParentTask(@RequestBody ParentTask parentTask) {
+		log.info("Inside addParentTask parentTask info {}",parentTask);
+		try {
+		return new ResponseEntity<>(programManagerService.addParentTask(parentTask), HttpStatus.OK);
+		}catch(Exception e) {
+			return new ResponseEntity<>("FAILED", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@RequestMapping(method=RequestMethod.GET, value="/parentTask/{projectId}", produces= {org.springframework.http.MediaType.APPLICATION_JSON_VALUE})
-	public List<ParentTask> getParentTask(@PathVariable(name="projectId") int projectId) {
-		List <ParentTask> parentTasksList= programManagerService.getParentTask(projectId);
-		log.info("Inside getParentTasks {}",parentTasksList.size());
-		return parentTasksList;
+	public ResponseEntity<List<ParentTask>> getParentTask(@PathVariable(name="projectId") int projectId) {
+		List <ParentTask> parentTasksList= new ArrayList<>();
+		log.info("Inside getParentTask by projectId {}",projectId);
+		try {
+			parentTasksList = programManagerService.getParentTask(projectId);
+			return new ResponseEntity<>(parentTasksList,HttpStatus.OK);
+		}catch(Exception e) {
+			return new ResponseEntity<>(parentTasksList, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		finally {
+			log.info("ParentTaskList size"+parentTasksList.size());
+		}
 	}
 	
 }

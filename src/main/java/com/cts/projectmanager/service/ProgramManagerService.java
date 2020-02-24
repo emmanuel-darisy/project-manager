@@ -18,17 +18,17 @@ public interface ProgramManagerService {
 	public String addProject(Project project,int userId) throws Exception;
 	public String updateProject(Project project) throws Exception;
 	public List<Project> getProjects() throws Exception;
-	public String deleteProject(Project project) throws Exception;
+	public String deleteProject(int projectID) throws Exception;
 	
 	
 	//public String addTask(Task task, int userId, int projectId,int parentId);
-	public String addTask(Task task);
-	public String updateTask(Task task);
-	public List<Task> getTasks();
-	public List<Task> getTasks(int projectId);
+	public String addTask(Task task) throws Exception;
+	public String updateTask(Task task) throws Exception;
+	public List<Task> getTasks() throws Exception;
+	public List<Task> getTasks(int projectId) throws Exception;
 	
-	public String addParentTask(ParentTask parentTask);
-	public List<ParentTask> getParentTask(int projectId);
+	public String addParentTask(ParentTask parentTask) throws Exception;
+	public List<ParentTask> getParentTask(int projectId) throws Exception;
 	
 	
 }

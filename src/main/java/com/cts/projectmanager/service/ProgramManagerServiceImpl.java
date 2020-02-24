@@ -81,9 +81,9 @@ public class ProgramManagerServiceImpl implements ProgramManagerService{
 	
 	@Override
 	@Transactional
-	public String deleteProject(Project project) throws Exception {
+	public String deleteProject(int projectId) throws Exception {
 		log.info("Invoking addProject ");
-		return programManagerDao.deleteProject(project);
+		return programManagerDao.deleteProject(projectId);
 		
 	}
 	
@@ -95,14 +95,14 @@ public class ProgramManagerServiceImpl implements ProgramManagerService{
 	}*/
 	@Override
 	@Transactional
-	public String addTask(Task task) {
+	public String addTask(Task task) throws Exception {
 		log.info("Invoking addTask ");
 		return programManagerDao.addTask(task);
 	}
 	
 	@Override
 	@Transactional
-	public String updateTask(Task task) {
+	public String updateTask(Task task) throws Exception {
 		log.info("Invoking updateTask ");
 		return programManagerDao.updateTask(task);
 	}
@@ -110,28 +110,28 @@ public class ProgramManagerServiceImpl implements ProgramManagerService{
 	
 	@Override
 	@Transactional
-	public String addParentTask(ParentTask parentTask) {
+	public String addParentTask(ParentTask parentTask) throws Exception {
 		log.info("Invoking addParent Task ");
 		return programManagerDao.addParentTask(parentTask);
 	}
 	
 	@Override
 	@Transactional
-	public List<Task> getTasks() {
+	public List<Task> getTasks() throws Exception {
 		log.info("Invoking getTasks ");
 		return programManagerDao.getTasks();
 	}
 	
 	@Override
 	@Transactional
-	public List<Task> getTasks(int projectId) {
+	public List<Task> getTasks(int projectId) throws Exception {
 		log.info("Invoking getTasks by projectId ");
 		return programManagerDao.getTasks(projectId);
 	}
 	
 	@Override
 	@Transactional
-	public List<ParentTask> getParentTask(int projectId) {
+	public List<ParentTask> getParentTask(int projectId) throws Exception {
 		log.info("Invoking get ParentTask ");
 		return programManagerDao.getParentTask(projectId);
 	}

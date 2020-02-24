@@ -93,8 +93,8 @@ public class ProgramManagerServiceImplTest {
 	public void testdeleteProject() throws Exception {
 		Project project = new Project();
 		String status = "";
-		when(programManagerDao.deleteProject(Mockito.any())).thenReturn(status);
-		assertNotNull(programManagerServiceImpl.deleteProject(project));
+		when(programManagerDao.deleteProject(Mockito.anyInt())).thenReturn(status);
+		assertNotNull(programManagerServiceImpl.deleteProject(123));
 	}
 
 	
